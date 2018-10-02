@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS post (
+  id BIGINT NOT NULL PRIMARY KEY,
+  title VARCHAR(50)
+);
+
+CREATE TABLE IF NOT EXISTS post_comment (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    review VARCHAR(50) NOT NULL,
+    post_id BIGINT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (post_id) REFERENCES post (id)
+);
