@@ -3,13 +3,37 @@ package com.demo.model;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+@NamedNativeQuery(
+	name = "PostDTO",
+	query =
+		"SELECT " +
+	    "	p.id AS id, " +
+	    "	p.title AS title " +
+	    "FROM Post p ",
+	resultSetMapping = "PostDTO"
+)
+@SqlResultSetMapping(
+	name = "PostDTO",
+	classes = @ConstructorResult(
+		targetClass = PostDTO.class,
+	    columns = {
+	    	@ColumnResult(name = "id", type = Long.class),
+	    	@ColumnResult(name = "title", type = String.class)
+	    }
+	)
+)
 
 @Entity
 @Table(name = "post")

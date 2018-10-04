@@ -1,6 +1,7 @@
 package com.demo;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.List;
 
@@ -85,6 +86,22 @@ public class DemoApplicationTests {
 				 
 		Tuple postDTO = postDTOs.get(0);
 		assertEquals("High-Performance JPA", postDTO.get("title"));
+	}
+	
+	@Test
+	public void testWithConstructorResult() {
+		
+		Post post = new Post();
+		post.setCreateBy("Rafael Monteiro");
+		post.setTitle("High-Performance JPA");
+		post.setUpdateBy("Rafael Monteiro");
+		manager.persist(post);
+		
+		List<PostDTO> postDTOs = manager.createNamedQuery("PostDTO", 
+				PostDTO.class).getResultList();
+				 
+		PostDTO postDTO = postDTOs.get(0);
+		assertEquals("High-Performance JPA", postDTO.getTitle());
 	}
 	
 }
