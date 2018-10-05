@@ -1,10 +1,19 @@
 package com.demo.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.MapKeyEnumerated;
 import javax.persistence.Table;
 
 @Entity
@@ -21,6 +30,15 @@ public class Employee {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "department_id")
 	private Department department;
+	
+	@ElementCollection
+	@CollectionTable(
+		name = "employee_phone", 
+		joinColumns = @JoinColumn(name = "employee_id"))
+	@MapKeyEnumerated(EnumType.STRING)
+	@MapKeyColumn(name = "type")
+	@Column(name = "number")
+	private Map<PhoneType, String> phones = new HashMap<>();
 
 	
 	public Integer getId() {
@@ -53,6 +71,18 @@ public class Employee {
 
 	public void setDepartment(Department department) {
 		this.department = department;
+	}
+	
+	public Map<PhoneType, String> getPhones() {
+		return phones;
+	}
+	
+	public void addPhone(PhoneType type, String number) {
+		this.phones.put(type, number);
+	}
+	
+	public void removePhone(PhoneType type) {
+		this.phones.remove(type);
 	}
 	
 }

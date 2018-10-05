@@ -12,3 +12,12 @@ CREATE TABLE IF NOT EXISTS employee (
     PRIMARY KEY (id),
     FOREIGN KEY (department_id) REFERENCES department (id)
 );
+
+CREATE TABLE IF NOT EXISTS employee_phone (
+	employee_id BIGINT NOT NULL,
+	type VARCHAR(8) NOT NULL,
+	number VARCHAR(15) NOT NULL,
+	
+	PRIMARY KEY (employee_id, type),
+	FOREIGN KEY (employee_id) REFERENCES employee (id)
+);

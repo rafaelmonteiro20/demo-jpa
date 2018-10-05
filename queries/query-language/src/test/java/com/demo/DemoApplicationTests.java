@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.demo.dto.EmployeeDetails;
 import com.demo.model.Department;
 import com.demo.model.Employee;
+import com.demo.model.PhoneType;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -63,6 +64,28 @@ public class DemoApplicationTests {
 				.getResultList();
 		
 		assertEquals(10, employees.size());
+	}
+	
+	@Test
+	public void testJoinOperator() {
+		List<Department> departments = manager.createQuery(
+				"select distinct d from Employee e " + 
+				"join e.department d", Department.class)
+				.getResultList();
+		
+		assertEquals(5, departments.size());
+	}
+	
+	@Test
+	public void testMapJoin() {
+		List<Object[]> objs = manager.createQuery(
+				"select e.name, key(p), value(p) from Employee e " + 
+				"join e.phones p where key(p) in ('WORK')", Object[].class)
+				.getResultList();
+		
+		assertEquals("ANA", objs.get(0)[0]);
+		assertEquals(PhoneType.WORK, objs.get(0)[1]);
+		assertEquals("333 3333333", objs.get(0)[2]);
 	}
 	
 }
