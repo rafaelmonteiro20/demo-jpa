@@ -1,3 +1,4 @@
+DELETE FROM address;
 DELETE FROM employee_phone;
 DELETE FROM employee;
 DELETE FROM department;
@@ -24,3 +25,9 @@ INSERT INTO employee_phone (employee_id, type, number) VALUES (1, 'CELL', '111 2
 INSERT INTO employee_phone (employee_id, type, number) VALUES (2, 'CELL', '222 2222222');
 INSERT INTO employee_phone (employee_id, type, number) VALUES (6, 'WORK', '333 3333333');
 INSERT INTO employee_phone (employee_id, type, number) VALUES (9, 'HOME', '444 4444444');
+
+INSERT INTO address (employee_id, street, city, state) VALUES (1, 'A', 'NOVA IORQUE', 'NOVA IORQUE');
+INSERT INTO address (employee_id, street, city, state) VALUES (2, 'B', 'BOSTON',    'MASSACHUSETTS');
+INSERT INTO address (employee_id, street, city, state) VALUES (7, 'C', 'NOVA IORQUE', 'NOVA IORQUE');
+
+

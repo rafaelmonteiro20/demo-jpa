@@ -21,3 +21,13 @@ CREATE TABLE IF NOT EXISTS employee_phone (
 	PRIMARY KEY (employee_id, type),
 	FOREIGN KEY (employee_id) REFERENCES employee (id)
 );
+
+CREATE TABLE IF NOT EXISTS address (
+	employee_id BIGINT NOT NULL,
+	street VARCHAR(40) NOT NULL,
+	city VARCHAR(30) NOT NULL,
+	state VARCHAR(30) NOT NULL,
+	
+	PRIMARY KEY (employee_id),
+	FOREIGN KEY	(employee_id) REFERENCES employee (id)
+);

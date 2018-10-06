@@ -1,6 +1,7 @@
 package com.demo;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.demo.dto.EmployeeDetails;
+import com.demo.model.Address;
 import com.demo.model.Department;
 import com.demo.model.Employee;
 import com.demo.model.PhoneType;
@@ -77,6 +79,19 @@ public class DemoApplicationTests {
 	}
 	
 	@Test
+	public void testJoinConditionWhereClause() {
+		List<EmployeeDetails> employees = manager.createQuery(
+				"select " +
+				"	new com.demo.dto.EmployeeDetails(" +
+				"   e.name, e.salary, e.department.name) " +
+				"from Employee e, Department d " +
+				"where e.department = d and d.name = 'TI'", 
+				EmployeeDetails.class).getResultList();
+		
+		assertEquals(3, employees.size());
+	}
+	
+	@Test
 	public void testMapJoin() {
 		List<Object[]> objs = manager.createQuery(
 				"select e.name, key(p), value(p) from Employee e " + 
@@ -86,6 +101,41 @@ public class DemoApplicationTests {
 		assertEquals("ANA", objs.get(0)[0]);
 		assertEquals(PhoneType.WORK, objs.get(0)[1]);
 		assertEquals("333 3333333", objs.get(0)[2]);
+	}
+	
+	@Test
+	public void testOuterJoin() {
+		List<EmployeeDetails> employees = manager.createQuery(
+				"select " +
+				"	new com.demo.dto.EmployeeDetails(" +
+				"   e.name, e.salary, e.department.name) " +
+				"from Employee e left outer join e.department d ", 
+				EmployeeDetails.class).getResultList();
+		
+		assertEquals(10, employees.size());
+	}
+	
+	@Test
+	public void testJoinWithON() {
+		List<EmployeeDetails> employees = manager.createQuery(
+				"select " +
+				"	new com.demo.dto.EmployeeDetails(" +
+				"   e.name, e.salary, e.department.name) " +
+				"from Employee e inner join e.department d " +
+				"on d.name like 'S%'", 
+				EmployeeDetails.class).getResultList();
+		
+		assertEquals(4, employees.size());
+	}
+	
+	@Test
+	public void testFetchJoin() {
+		List<Address> addresses = manager.createQuery(
+				"select a from Address a join fetch a.employee ", 
+				Address.class).getResultList();
+		
+		assertEquals(3, addresses.size());
+		assertNotNull(addresses.get(0).getEmployee());
 	}
 	
 }
