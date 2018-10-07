@@ -35,6 +35,7 @@ INSERT INTO address (employee_id, street, city, state) VALUES (7, 'C', 'NOVA IOR
 INSERT INTO project (id, name, type, qa_rating) VALUES (1, 'PROJECT A', 'DESIGN', null);
 INSERT INTO project (id, name, type, qa_rating) VALUES (2, 'PROJECT B', 'QUALITY', 4);
 INSERT INTO project (id, name, type, qa_rating) VALUES (3, 'PROJECT C', 'DESIGN', null);
+INSERT INTO project (id, name, type, qa_rating) VALUES (4, 'PROJECT D', 'DESIGN', null);
 
 INSERT INTO project_employee (project_id, employee_id) VALUES (1, 5);
 INSERT INTO project_employee (project_id, employee_id) VALUES (1, 9);

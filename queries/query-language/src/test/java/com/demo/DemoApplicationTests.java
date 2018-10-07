@@ -194,4 +194,37 @@ public class DemoApplicationTests {
 		assertEquals(3, employees.size());
 	}
 	
+	@Test
+	public void testIsEmpty() {
+		List<Project> projects = manager.createQuery(
+			"select p from Project p " + 
+			"where p.employees is empty",
+			Project.class).getResultList();
+		
+		assertEquals(1, projects.size());
+	}
+	
+	@Test
+	public void testMemberOf() {
+		Employee clark = manager.getReference(Employee.class, 9);
+		
+		List<Project> projects = manager.createQuery(
+			"select p from Project p " + 
+			"where :employee member of p.employees", Project.class)
+			.setParameter("employee", clark)
+			.getResultList();
+		
+		assertEquals(2, projects.size());
+	}
+	
+	@Test
+	public void testExistsExpression() {
+		List<Employee> employees = manager.createQuery(
+			"select e from Employee e where not exists ( " + 
+			"	select 1 from Project p where e member of p.employees)" , Employee.class)
+			.getResultList();
+		
+		assertEquals(5, employees.size());
+	}
+	
 }
