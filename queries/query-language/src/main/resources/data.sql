@@ -1,3 +1,5 @@
+DELETE FROM project_employee;
+DELETE FROM project;
 DELETE FROM address;
 DELETE FROM employee_phone;
 DELETE FROM employee;
@@ -30,4 +32,14 @@ INSERT INTO address (employee_id, street, city, state) VALUES (1, 'A', 'NOVA IOR
 INSERT INTO address (employee_id, street, city, state) VALUES (2, 'B', 'BOSTON',    'MASSACHUSETTS');
 INSERT INTO address (employee_id, street, city, state) VALUES (7, 'C', 'NOVA IORQUE', 'NOVA IORQUE');
 
+INSERT INTO project (id, name, type, qa_rating) VALUES (1, 'PROJECT A', 'DESIGN', null);
+INSERT INTO project (id, name, type, qa_rating) VALUES (2, 'PROJECT B', 'QUALITY', 4);
+INSERT INTO project (id, name, type, qa_rating) VALUES (3, 'PROJECT C', 'DESIGN', null);
+
+INSERT INTO project_employee (project_id, employee_id) VALUES (1, 5);
+INSERT INTO project_employee (project_id, employee_id) VALUES (1, 9);
+INSERT INTO project_employee (project_id, employee_id) VALUES (2, 1);
+INSERT INTO project_employee (project_id, employee_id) VALUES (2, 3);
+INSERT INTO project_employee (project_id, employee_id) VALUES (2, 4);
+INSERT INTO project_employee (project_id, employee_id) VALUES (3, 9);
 

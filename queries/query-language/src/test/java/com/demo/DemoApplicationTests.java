@@ -1,6 +1,7 @@
 package com.demo;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ import com.demo.model.Address;
 import com.demo.model.Department;
 import com.demo.model.Employee;
 import com.demo.model.PhoneType;
+import com.demo.model.Project;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
