@@ -1,7 +1,6 @@
 package com.demo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -136,6 +135,61 @@ public class DemoApplicationTests {
 		
 		assertEquals(3, addresses.size());
 		assertNotNull(addresses.get(0).getEmployee());
+	}
+	
+	@Test
+	public void testBetweenExpression() {
+		List<Employee> employees = manager.createQuery(
+			"select e from Employee e " + 
+			"where e.salary between 1000 and 2000", Employee.class)
+				.getResultList();
+		
+		assertEquals(3, employees.size());
+	}
+	
+	@Test
+	public void testLikeExpression() {
+		List<Department> departments = manager.createQuery(
+			"select d from Department d " + 
+			"where d.name like 'S%'", Department.class)
+				.getResultList();
+		
+		assertEquals(2, departments.size());
+	}
+	
+	@Test
+	public void testSubquery() {
+		List<Employee> employees = manager.createQuery(
+			"select e from Employee e " + 
+			"where e.salary = (" +
+			"	select max(salary) from Employee)", 
+			Employee.class).getResultList();
+		
+		assertEquals(1, employees.size());
+		assertEquals("MARTIN", employees.get(0).getName());
+		assertEquals(4000.0, employees.get(0).getSalary(), 0.0001);
+	}
+	
+	@Test
+	public void testSubqueryCorrelated() {
+		List<Employee> employees = manager.createQuery(
+			"select e from Employee e " + 
+			"where exists (" +
+			"	select 1 from e.phones p " +
+			"	where key(p) = 'CELL')",
+			Employee.class).getResultList();
+		
+		assertEquals(2, employees.size());
+	}
+	
+	@Test
+	public void testInExpression() {
+		List<Employee> employees = manager.createQuery(
+			"select e from Employee e " + 
+			"where e.department.name in ('ADMINISTRATIVE', 'HR')",
+			Employee.class).getResultList();
+		
+		assertEquals(3, employees.size());
 	}
 	
 }
