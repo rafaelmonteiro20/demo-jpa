@@ -1,7 +1,6 @@
 package com.demo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -14,8 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.demo.dto.EmployeeDetails;
+import com.demo.dto.EmployeeProject;
 import com.demo.model.Address;
 import com.demo.model.Department;
+import com.demo.model.DesignProject;
 import com.demo.model.Employee;
 import com.demo.model.PhoneType;
 import com.demo.model.Project;
@@ -221,10 +222,33 @@ public class DemoApplicationTests {
 	public void testExistsExpression() {
 		List<Employee> employees = manager.createQuery(
 			"select e from Employee e where not exists ( " + 
-			"	select 1 from Project p where e member of p.employees)" , Employee.class)
+			"	select 1 from Project p where e member of p.employees)", Employee.class)
 			.getResultList();
 		
 		assertEquals(5, employees.size());
+	}
+	
+	@Test
+	public void testSubclassDiscrimination() {
+		
+		List<Project> projects = manager.createQuery(
+				"select p from Project p where type(p) = :type", Project.class)
+				.setParameter("type", DesignProject.class)
+				.getResultList();
+		
+		assertEquals(3, projects.size());
+	}
+	
+	@Test
+	public void testDowncasting() {
+		List<EmployeeProject> result = manager.createQuery(
+			"select distinct new com.demo.dto.EmployeeProject( "
+		  + "e.name, p.name, p.qaRating) from Project p "
+		  + "inner join p.employees e "
+		  + "where treat(p as QualityProject).qaRating > 3", EmployeeProject.class)
+				.getResultList();
+		
+		assertEquals(3, result.size());
 	}
 	
 }
