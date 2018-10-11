@@ -251,4 +251,23 @@ public class DemoApplicationTests {
 		assertEquals(3, result.size());
 	}
 	
+	@Test
+	public void testFuctionSize() {
+		List<Project> projects = manager.createQuery(
+			"select p from Project p where size(p.employees) = 1", Project.class)
+			.getResultList();
+		
+		assertEquals(1, projects.size());
+	}
+	
+	@Test
+	public void testFuctionLength() {
+		List<String> departments = manager.createQuery(
+			"select d.name from Department d where length(d.name) = 2", String.class)
+			.getResultList();
+		
+		assertTrue(departments.contains("TI"));
+		assertTrue(departments.contains("HR"));
+	}
+	
 }
