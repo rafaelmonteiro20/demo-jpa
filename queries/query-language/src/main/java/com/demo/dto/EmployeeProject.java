@@ -5,7 +5,7 @@ public class EmployeeProject {
 	private String employeeName;
 	private String projectName;
 	private Integer qaRating;
-
+	
 	public EmployeeProject(String employeeName, String projectName, Integer qaRating) {
 		this.employeeName = employeeName;
 		this.projectName = projectName;

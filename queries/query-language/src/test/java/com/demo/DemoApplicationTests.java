@@ -270,4 +270,72 @@ public class DemoApplicationTests {
 		assertTrue(departments.contains("HR"));
 	}
 	
+	@Test
+	public void testCaseExpression() {
+		List<Object[]> projects = manager.createQuery(
+			"select " +
+			"	p.name, " +
+			"	case type(p) " +
+			"	when DesignProject then 'Development' " +
+			"	when QualityProject then 'QA' " +
+			"	end " +
+			"from Project p " + 
+			"where p.employees is empty", Object[].class).getResultList();
+		
+		assertEquals("PROJECT D", projects.get(0)[0]);
+		assertEquals("Development", projects.get(0)[1]);
+	}
+	
+	@Test
+	public void testOrderBy() {
+		List<String> departments = manager.createQuery(
+			"select d.name from Department d order by d.name desc", String.class)
+				.getResultList();
+		
+		assertEquals("TI", departments.get(0));
+		assertEquals("ADMINISTRATIVE", departments.get(4));
+	}
+	
+	@Test
+	public void testCount() {
+		Long count = manager.createQuery(
+			"select count(*) from Department d", Long.class)
+				.getSingleResult();
+		
+		assertEquals(new Long(5), count);
+	}
+	
+	@Test
+	public void testSum() {
+		Double total = manager.createQuery(
+			"select sum(e.salary) from Employee e", Double.class)
+				.getSingleResult();
+		
+		assertEquals(19725.0, total, 0.0001);
+	}
+	
+	@Test
+	public void testGroupByClause() {
+		List<Object[]> departments = manager.createQuery(
+			" select d.name, count(e) from Employee e " +
+			" join e.department d " +
+			" group by d.name " +
+			" order by d.name", Object[].class).getResultList();
+		
+		assertEquals("ADMINISTRATIVE", departments.get(0)[0]);
+		assertEquals(new Long(2), departments.get(0)[1]);
+	}
+	
+	@Test
+	public void testHavingClause() {
+		List<Object[]> departments = manager.createQuery(
+			" select d.name, avg(e.salary) from Employee e " +
+			" join e.department d " +
+			" group by d.name " +
+			" having avg(e.salary) = 1500.0", Object[].class).getResultList();
+		
+		assertEquals("HR", departments.get(0)[0]);
+		assertEquals(1500.0, (double) departments.get(0)[1], 0.00001);
+	}
+	
 }
