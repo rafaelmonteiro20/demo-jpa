@@ -30,7 +30,7 @@ public class DebugCustomerListener {
 	}
 	
 	@PostLoad
-	public void posLoad(Customer customer) {
+	public void postLoad(Customer customer) {
 		logger.debug("Load customer id: {}", customer.getId());
 	}
 	

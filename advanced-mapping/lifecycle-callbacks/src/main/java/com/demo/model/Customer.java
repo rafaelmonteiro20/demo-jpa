@@ -78,8 +78,6 @@ public class Customer implements Identifiable<Long> {
 	@PrePersist 
 	private void preSave() {
 		this.document = TypePerson.removeFormat(this.document);
-		
-		System.out.println(">> Callback Entity...");
 	}
 	
 	@PostLoad
