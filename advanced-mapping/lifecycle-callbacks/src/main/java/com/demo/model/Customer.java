@@ -3,6 +3,7 @@ package com.demo.model;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
@@ -11,8 +12,12 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import com.demo.listener.AgeValidator;
+import com.demo.listener.DebugCustomerListener;
+
 @Entity
 @Table(name = "customer")
+@EntityListeners({ DebugCustomerListener.class, AgeValidator.class })
 public class Customer implements Identifiable<Long> {
 
 	@Id
@@ -73,6 +78,8 @@ public class Customer implements Identifiable<Long> {
 	@PrePersist 
 	private void preSave() {
 		this.document = TypePerson.removeFormat(this.document);
+		
+		System.out.println(">> Callback Entity...");
 	}
 	
 	@PostLoad

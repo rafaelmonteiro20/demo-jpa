@@ -42,7 +42,7 @@ public class DemoApplicationTests {
 		customer.setName("JOE");
 		customer.setDocument("22.222.555/8888-00");
 		customer.setType(TypePerson.LEGAL);
-		customer.setBirthDate(LocalDate.of(2005, Month.MAY, 15));
+		customer.setBirthDate(LocalDate.of(2000, Month.MAY, 15));
 		
 		manager.persist(customer);
 		
@@ -55,4 +55,18 @@ public class DemoApplicationTests {
 		
 	}
 
+	@Test(expected = RuntimeException.class)
+	public void testEntityListener() {
+		
+		Customer customer = new Customer();
+		customer.setId(50L);
+		customer.setName("ANNA");
+		customer.setDocument("333.444.555-60");
+		customer.setType(TypePerson.FISICAL);
+		customer.setBirthDate(LocalDate.now().minusMonths(2).minusYears(16));
+		
+		manager.persist(customer);
+		
+	}
+	
 }
