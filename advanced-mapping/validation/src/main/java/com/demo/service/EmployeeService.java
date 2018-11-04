@@ -19,7 +19,9 @@ public class EmployeeService {
 	
 	public Employee save(Employee employee) {
 
-		Set<ConstraintViolation<Employee>> violations = validator.validate(employee);
+		Class<?> group = employee.getType().getGroup();
+		
+		Set<ConstraintViolation<Employee>> violations = validator.validate(employee, group);
 		
 		/**
 		 * persist employee with JPA

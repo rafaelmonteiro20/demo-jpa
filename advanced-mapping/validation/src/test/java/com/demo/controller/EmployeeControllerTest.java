@@ -1,6 +1,8 @@
 package com.demo.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.demo.PayloadExtractor;
 import com.demo.controller.handler.error.Error;
 import com.demo.model.Employee;
+import com.demo.model.TypeEmployee;
 import com.demo.service.EmployeeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +59,7 @@ public class EmployeeControllerTest {
 		employee.setId(1L);
 		employee.setName("RAFAEL MONTEIRO RAFAEL MONTEIRO");
 		employee.setBirthDate(LocalDate.now().plusDays(1));
+		employee.setType(TypeEmployee.PARTTIME);
 		
 		mockMvc.perform(post("/employees")
 					.contentType(MediaType.APPLICATION_JSON)
@@ -66,13 +70,20 @@ public class EmployeeControllerTest {
 		List<Error> errors = payloadExtractor.asListOf(Error.class);
 		assertThat(errors)
 			.contains(new Error("name", "size must be between 0 and 30"))
-			.contains(new Error("birthDate", "must be a past date"));
+			.contains(new Error("birthDate", "must be a past date"))
+			.contains(new Error("hourlyWage", "must not be null"));
+		
 	}
 
 	@Test
 	public void testSaveEmployee() throws Exception {
 		
-		Employee employee = new Employee(1L, "RAFAEL MONTEIRO", LocalDate.of(1989, 6, 20));
+		Employee employee = new Employee();
+		employee.setId(1L);
+		employee.setName("RAFAEL MONTEIRO");
+		employee.setBirthDate(LocalDate.of(1989, 6, 20));
+		employee.setType(TypeEmployee.FULLTIME);
+		employee.setSalary(1000L);
 		
 		mockMvc.perform(post("/employees")
 					.contentType(MediaType.APPLICATION_JSON)
@@ -81,8 +92,9 @@ public class EmployeeControllerTest {
 			.andDo(payloadExtractor);
 		
 		Employee rafael = payloadExtractor.as(Employee.class);
-		assertThat(rafael)
-			.isEqualToComparingFieldByField(new Employee(1L, "RAFAEL MONTEIRO", LocalDate.of(1989, 6, 20)));
+		assertEquals("RAFAEL MONTEIRO", rafael.getName());
+		assertEquals(new Long(1000), rafael.getSalary());
+		assertNull(rafael.getHourlyWage());
 	}
 	
 	private String toJson(Employee employee) throws JsonProcessingException {

@@ -3,9 +3,12 @@ package com.demo.model;
 import java.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import com.demo.model.validator.group.FullTime;
+import com.demo.model.validator.group.PartTime;
 
 public class Employee implements Identifiable<Long> {
 
@@ -19,21 +22,26 @@ public class Employee implements Identifiable<Long> {
 	@Past
 	private LocalDate birthDate;
 
+	@NotNull
+	private TypeEmployee type;
+	
+	@NotNull(groups = FullTime.class)
+	@Null(groups = PartTime.class)
+	private Long salary;
+	
+	@NotNull(groups = PartTime.class)
+	@Null(groups = FullTime.class)
+	private Double hourlyWage;
+
 	public Employee() {
 
-	}
-	
-	public Employee(Long id, String name, LocalDate birthDate) {
-		this.id = id;
-		this.name = name;
-		this.birthDate = birthDate;
 	}
 
 	@Override
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -52,6 +60,30 @@ public class Employee implements Identifiable<Long> {
 
 	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
+	}
+
+	public TypeEmployee getType() {
+		return type;
+	}
+	
+	public void setType(TypeEmployee type) {
+		this.type = type;
+	}
+	
+	public Long getSalary() {
+		return salary;
+	}
+	
+	public void setSalary(Long salary) {
+		this.salary = salary;
+	}
+	
+	public Double getHourlyWage() {
+		return hourlyWage;
+	}
+	
+	public void setHourlyWage(Double hourlyWage) {
+		this.hourlyWage = hourlyWage;
 	}
 	
 }
