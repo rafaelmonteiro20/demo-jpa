@@ -76,14 +76,37 @@ public class EmployeeControllerTest {
 	}
 
 	@Test
+	public void testNewConstraint() throws Exception {
+		
+		Employee employee = new Employee();
+		employee.setId(2L);
+		employee.setName("RAFAEL MONTEIRO");
+		employee.setBirthDate(LocalDate.of(1989, 6, 20));
+		employee.setType(TypeEmployee.FULLTIME);
+		employee.setSalary(1200L);
+		employee.setParkingSpace(31);
+		
+		mockMvc.perform(post("/employees")
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(toJson(employee)))
+			.andExpect(status().isBadRequest())
+			.andDo(payloadExtractor);
+		
+		List<Error> errors = payloadExtractor.asListOf(Error.class);
+		assertThat(errors)
+			.contains(new Error("parkingSpace", "number must be even"));
+	}
+
+	@Test
 	public void testSaveEmployee() throws Exception {
 		
 		Employee employee = new Employee();
-		employee.setId(1L);
+		employee.setId(3L);
 		employee.setName("RAFAEL MONTEIRO");
 		employee.setBirthDate(LocalDate.of(1989, 6, 20));
 		employee.setType(TypeEmployee.FULLTIME);
 		employee.setSalary(1000L);
+		employee.setParkingSpace(10);
 		
 		mockMvc.perform(post("/employees")
 					.contentType(MediaType.APPLICATION_JSON)

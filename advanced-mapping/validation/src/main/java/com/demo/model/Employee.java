@@ -7,6 +7,7 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
+import com.demo.model.validator.Even;
 import com.demo.model.validator.group.FullTime;
 import com.demo.model.validator.group.PartTime;
 
@@ -32,6 +33,9 @@ public class Employee implements Identifiable<Long> {
 	@NotNull(groups = PartTime.class)
 	@Null(groups = FullTime.class)
 	private Double hourlyWage;
+	
+	@Even
+	private Integer parkingSpace;
 
 	public Employee() {
 
@@ -84,6 +88,14 @@ public class Employee implements Identifiable<Long> {
 	
 	public void setHourlyWage(Double hourlyWage) {
 		this.hourlyWage = hourlyWage;
+	}
+	
+	public Integer getParkingSpace() {
+		return parkingSpace;
+	}
+	
+	public void setParkingSpace(Integer parkingSpace) {
+		this.parkingSpace = parkingSpace;
 	}
 	
 }
