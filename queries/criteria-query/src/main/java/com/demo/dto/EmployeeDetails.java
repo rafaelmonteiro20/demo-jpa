@@ -2,18 +2,22 @@ package com.demo.dto;
 
 public class EmployeeDetails {
 
-	private String nome;
+	private String name;
 	private double salary;
 	private String department;
 	
-	public EmployeeDetails(String nome, double salary, String department) {
-		this.nome = nome;
+	public EmployeeDetails(String name, double salary) {
+		this(name, salary, null);
+	}
+	
+	public EmployeeDetails(String name, double salary, String department) {
+		this.name = name;
 		this.salary = salary;
 		this.department = department;
 	}
 
-	public String getNome() {
-		return nome;
+	public String getName() {
+		return name;
 	}
 
 	public double getSalary() {
