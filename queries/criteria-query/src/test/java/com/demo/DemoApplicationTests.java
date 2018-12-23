@@ -1,6 +1,7 @@
 package com.demo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -10,6 +11,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Root;
 
 import org.junit.Test;
@@ -18,8 +21,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.demo.dto.EmployeeDetails;
+import com.demo.model.Address;
 import com.demo.model.Department;
 import com.demo.model.Employee;
+import com.demo.model.PhoneType;
+import com.demo.model.Project;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -165,5 +171,97 @@ public class DemoApplicationTests {
 		
 		assertEquals(10, employees.size());
 	}
+	
+	@Test
+	public void testJoinOperator() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Project> root = criteria.from(Project.class);
+		
+		Join<Project, Employee> e = root.join("employees");
+		criteria.select(e);
+		
+		criteria.where(cb.equal(root.get("name"), "PROJECT A"));
+		
+		List<Employee> employees = manager.createQuery(criteria)
+			.getResultList();
+		
+		assertEquals(2, employees.size());
+	}
+	
+	@Test
+	public void testJoinConditionWhereClause() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Department> criteria = cb.createQuery(Department.class);
+		Root<Employee> e = criteria.from(Employee.class);
+		Root<Department> d = criteria.from(Department.class);		
+
+		criteria.distinct(true);
+		criteria.select(d);
+		criteria.where(cb.equal(d, e.get("department")));
+		
+		List<Department> departments = manager.createQuery(criteria)
+			.getResultList();
+		
+		assertEquals(5, departments.size());
+	}
+	
+	@Test
+	public void testMapJoin() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Tuple> criteria = cb.createTupleQuery();
+		Root<Employee> e = criteria.from(Employee.class);
+		
+		MapJoin<Employee, PhoneType, String> p = e.joinMap("phones");
+		criteria.multiselect(
+				e.get("name").alias("name"),
+				p.key().alias("type"),
+				p.value().alias("number"));
+		
+		criteria.where(cb.equal(p.key(), PhoneType.WORK));
+		
+		Tuple result = manager.createQuery(criteria).getSingleResult();
+		
+		assertEquals("ANA", result.get("name"));
+		assertEquals(PhoneType.WORK, result.get("type"));
+		assertEquals("333 3333333", result.get("number"));
+	}
+	
+	@Test
+	public void testFetchJoin() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Address> criteria = cb.createQuery(Address.class);
+		Root<Address> a = criteria.from(Address.class);
+		
+		a.fetch("employee");
+		criteria.select(a);
+		
+		List<Address> addresses = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(3, addresses.size());
+		assertNotNull(addresses.get(0).getEmployee().getName());
+	}
+	
+	@Test
+	public void testJoinWithON() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Employee> e = criteria.from(Employee.class);
+		
+		Join<Employee, Department> d = e.join("department");
+		d.on(cb.like(d.get("name"), "S%"));
+		
+		List<Employee> employees = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(4, employees.size());
+	}
+	
 }
 
