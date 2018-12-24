@@ -337,6 +337,55 @@ public class DemoApplicationTests {
 		assertEquals(2, employees.size());
 	}
 
+	@Test
+	public void testInExpression() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Employee> e = criteria.from(Employee.class);
+		Join<Employee, Department> d = e.join("department");
+		
+		criteria.select(e);
+		criteria.where(d.get("name").in("ADMINISTRATIVE", "HR"));
+		
+		List<Employee> employees = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(3, employees.size());
+	}
+	
+	@Test
+	public void testIsEmpty() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Project> criteria = cb.createQuery(Project.class);
+		Root<Project> p = criteria.from(Project.class);
+		
+		criteria.select(p);
+		criteria.where(cb.isEmpty(p.get("employees")));
+		
+		List<Project> projects = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(1, projects.size());
+	}
+	
+	@Test
+	public void testMemberOf() {
+		
+		Employee clark = manager.getReference(Employee.class, 9);
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Project> criteria = cb.createQuery(Project.class);
+		Root<Project> p = criteria.from(Project.class);
+		
+		criteria.select(p);
+		criteria.where(cb.isMember(clark, p.get("employees")));
+		
+		List<Project> projects = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(2, projects.size());
+	}
 	
 }
-
