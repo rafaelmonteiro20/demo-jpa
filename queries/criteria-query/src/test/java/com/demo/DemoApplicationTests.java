@@ -1,8 +1,6 @@
 package com.demo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -13,7 +11,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.MapJoin;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -262,6 +263,80 @@ public class DemoApplicationTests {
 		
 		assertEquals(4, employees.size());
 	}
+	
+	@Test
+	public void testPredicateConstructionUsingConjunction() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Employee> e = criteria.from(Employee.class);
+		Join<Employee, Department> d = e.join("department");
+		
+		criteria.select(e);
+		Predicate predicate = cb.conjunction();
+		
+		ParameterExpression<String> department = cb.parameter(String.class, "department");
+		predicate = cb.and(predicate, cb.equal(d.get("name"), department));
+		
+		ParameterExpression<Double> salary = cb.parameter(Double.class, "salary");
+		predicate = cb.and(predicate, cb.le(e.get("salary"), salary));
+		
+		criteria.where(predicate);
+		
+		List<Employee> employees = manager.createQuery(criteria)
+				.setParameter("department", "SUPPORT")
+				.setParameter("salary", 1000.0)
+				.getResultList();
+		
+		assertEquals(1, employees.size());
+	}
+	
+	@Test
+	public void testSubquery() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Employee> e = criteria.from(Employee.class);
+		
+		criteria.select(e);
+		
+		Subquery<Double> subquery = criteria.subquery(Double.class);
+		Root<Employee> root = subquery.from(Employee.class);
+		subquery.select(cb.max(root.get("salary")));
+		
+		criteria.where(cb.equal(e.get("salary"), subquery));
+		
+		Employee employee = manager.createQuery(criteria)
+				.getSingleResult();
+		
+		assertEquals("MARTIN", employee.getName());
+		assertEquals(4000.0, employee.getSalary(), 0.0001);
+	}
+	
+	@Test
+	public void testSubqueryCorrelated() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Employee> e = criteria.from(Employee.class);
+		
+		criteria.select(e);
+		
+		Subquery<Integer> subquery = criteria.subquery(Integer.class);
+		Root<Employee> root = subquery.correlate(e);
+		MapJoin<Employee, PhoneType, String> p = root.joinMap("phones");
+		
+		subquery.select(cb.<Integer>literal(1));
+		subquery.where(cb.equal(p.key(), PhoneType.CELL));
+		
+		criteria.where(cb.exists(subquery));
+		
+		List<Employee> employees = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(2, employees.size());
+	}
+
 	
 }
 
