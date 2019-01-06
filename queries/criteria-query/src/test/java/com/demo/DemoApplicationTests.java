@@ -1,6 +1,8 @@
 package com.demo;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ import com.demo.model.Department;
 import com.demo.model.Employee;
 import com.demo.model.PhoneType;
 import com.demo.model.Project;
+import com.demo.model.QualityProject;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -386,6 +389,118 @@ public class DemoApplicationTests {
 				.getResultList();
 		
 		assertEquals(2, projects.size());
+	}
+	
+	@Test
+	public void testFuctionLength() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<String> criteria = cb.createQuery(String.class);
+		Root<Department> d = criteria.from(Department.class);
+		
+		criteria.select(d.get("name"))
+			.where(cb.equal(cb.length(d.get("name")), 2));
+		
+		List<String> departments = manager.createQuery(criteria)
+			.getResultList();
+		
+		assertTrue(departments.contains("TI"));
+		assertTrue(departments.contains("HR"));
+	}
+	
+	@Test
+	public void testDowncasting() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
+		Root<Project> p = criteria.from(Project.class);
+		Join<Project, Employee> e = p.join("employees");
+		
+		criteria.distinct(true);
+		criteria.select(e);
+		criteria.where(cb.gt(cb.treat(p, QualityProject.class).get("qaRating"), 3));
+		
+		List<Employee> result = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals(3, result.size());
+	}
+
+	@Test
+	public void testOrderBy() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<String> criteria = cb.createQuery(String.class);
+		Root<Department> d = criteria.from(Department.class);
+		
+		criteria.select(d.get("name"));
+		criteria.orderBy(cb.desc(d.get("name")));
+		
+		List<String> departments = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals("TI", departments.get(0));
+		assertEquals("SUPPORT", departments.get(1));
+		assertEquals("SALES", departments.get(2));
+		assertEquals("HR", departments.get(3));
+		assertEquals("ADMINISTRATIVE", departments.get(4));
+	}
+	
+	@Test
+	public void testCount() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Long> criteria = cb.createQuery(Long.class);
+		Root<Department> d = criteria.from(Department.class);
+		
+		criteria.select(cb.count(d));
+		
+		Long count = manager.createQuery(criteria)
+				.getSingleResult();
+		
+		assertEquals(new Long(5), count);
+	}
+	
+	@Test
+	public void testGroupByClause() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Object[]> criteria = cb.createQuery(Object[].class);
+		Root<Employee> e = criteria.from(Employee.class);
+		Join<Employee, Department> d = e.join("department");
+		
+		criteria.multiselect(d.get("name"),
+				cb.count(e));
+		
+		criteria.groupBy(d.get("name"));
+		criteria.orderBy(cb.asc(d.get("name")));
+		
+		List<Object[]> departments = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals("ADMINISTRATIVE", departments.get(0)[0]);
+		assertEquals(new Long(2), departments.get(0)[1]);
+	}
+	
+	@Test
+	public void testHavingClause() {
+		
+		CriteriaBuilder cb = manager.getCriteriaBuilder();
+		CriteriaQuery<Object[]> criteria = cb.createQuery(Object[].class);
+		Root<Employee> e = criteria.from(Employee.class);
+		Join<Employee, Department> d = e.join("department");
+		
+		criteria.multiselect(d.get("name"),
+				cb.avg(e.get("salary")));
+		
+		criteria.groupBy(d.get("name"));
+		criteria.having(cb.equal(cb.avg(e.get("salary")), 1500.0));
+		
+		List<Object[]> departments = manager.createQuery(criteria)
+				.getResultList();
+		
+		assertEquals("HR", departments.get(0)[0]);
+		assertEquals(1500.0, (double) departments.get(0)[1], 0.00001);
 	}
 	
 }
